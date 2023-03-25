@@ -2,25 +2,29 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.10"
 
+lazy val akkaHttpVersion = "10.2.8"
+lazy val akkaVersion     = "2.6.9"
+lazy val circeVersion    = "0.14.1"
+
 lazy val root = (project in file("."))
   .settings(
     name := "akka-cassandra-bank"
   )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-http" % "10.5.0",
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.0-M6",
-  "com.typesafe.akka" %% "akka-stream" % "2.8.0-M6",
-  "com.typesafe.akka" %% "akka-persistence-typed" % "2.8.0-M6",
-  "com.datastax.oss" % "java-driver-core" % "4.15.0",
-  "com.typesafe.akka" %% "akka-persistence-cassandra" % "1.1.0",
-  "io.circe" %% "circe-core" % "0.14.5",
-  "io.circe" %% "circe-generic" % "0.15.0-M1",
-  "io.circe" %% "circe-parser" % "0.15.0-M1",
-  "de.heikoseeberger" %% "akka-http-circe" % "1.39.2",
-  "ch.qos.logback" % "logback-classic" % "1.4.5",
-  "com.typesafe.akka" %% "akka-http-testkit" % "10.5.0" % Test,
-  "com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.8.0-M6" % Test,
-  "org.scalatest" %% "scalatest" % "3.3.0-SNAP3" % Test
+  "com.typesafe.akka" %% "akka-http"                  % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-actor-typed"           % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream"                % akkaVersion,
+  "com.typesafe.akka" %% "akka-persistence-typed"     % akkaVersion,
+  "com.datastax.oss"  %  "java-driver-core"           % "4.13.0",   // See https://github.com/akka/alpakka/issues/2556
+  "com.typesafe.akka" %% "akka-persistence-cassandra" % "1.0.5",
+  "io.circe"          %% "circe-core"                 % circeVersion,
+  "io.circe"          %% "circe-generic"              % circeVersion,
+  "io.circe"          %% "circe-parser"               % circeVersion,
+  "de.heikoseeberger" %% "akka-http-circe"            % "1.39.2",
+  "ch.qos.logback"    % "logback-classic"             % "1.2.10",
 
+  "com.typesafe.akka" %% "akka-http-testkit"          % akkaHttpVersion % Test,
+  "com.typesafe.akka" %% "akka-actor-testkit-typed"   % akkaVersion     % Test,
+  "org.scalatest"     %% "scalatest"                  % "3.2.9"         % Test
 )

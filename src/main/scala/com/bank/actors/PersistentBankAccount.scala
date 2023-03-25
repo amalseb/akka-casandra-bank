@@ -6,9 +6,43 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 
 
 // a single bank account
-class PersistentBankAccount {
-import PersistentBankAccount._
-  import PersistentBankAccount.Command._
+object PersistentBankAccount {
+  //  DS used are:
+  //  commands = messages
+  sealed trait Command
+
+  object Command {
+    case class CreateBankAccount(user: String, currency: String, initialBalance: Double, replyTo: ActorRef[Response]) extends Command
+
+    case class UpdateBalance(id: String, currency: String, amount: Double, replyTo: ActorRef[Response]) extends Command
+
+    case class GetBankAccount(id: String, replyTo: ActorRef[Response]) extends Command
+
+  }
+
+  import Command._
+  import Response._
+  //  events = to persist to Cassandra
+  trait Event
+
+  case class BankAccountCreated(bankAccount: BankAccount) extends Event
+
+  case class BalanceUpdated(amount: Double) extends Event
+
+  //  state
+  case class BankAccount(id: String, user: String, currency: String, balance: Double)
+
+  //  responses
+  sealed trait Response
+  object Response {
+    case class BankAccountCreatedResponse(id: String) extends Response
+
+    case class BankAccountBalanceUpdateResponse(maybeBankAccount: Option[BankAccount]) extends Response
+
+    case class GetBankAccountResponse(maybeBankAccount: Option[BankAccount]) extends Response
+
+  }
+  import Command._
 //  command handler = message handler => persist an event
 //  event handler => update state
 //  state
@@ -47,41 +81,4 @@ import PersistentBankAccount._
       commandHandler =  commandHandler,
       eventHandler = eventHandler
     )
-}
-
-object PersistentBankAccount {
-  //  DS used are:
-  //  commands = messages
-  sealed trait Command
-
-  object Command {
-    case class CreateBankAccount(user: String, currency: String, initialBalance: Double, replyTo: ActorRef[Response]) extends Command
-
-    case class UpdateBalance(id: String, currency: String, amount: Double, replyTo: ActorRef[Response]) extends Command
-
-    case class GetBankAccount(id: String, replyTo: ActorRef[Response]) extends Command
-
-  }
-
-  import Command._
-
-  //  events = to persist to Cassandra
-  trait Event
-
-  case class BankAccountCreated(bankAccount: BankAccount) extends Event
-
-  case class BalanceUpdated(amount: Double) extends Event
-
-  //  state
-  case class BankAccount(id: String, user: String, currency: String, balance: Double)
-
-  //  responses
-  sealed trait Response
-
-  case class BankAccountCreatedResponse(id: String) extends Response
-
-  case class BankAccountBalanceUpdateResponse(maybeBankAccount: Option[BankAccount]) extends Response
-
-  case class GetBankAccountResponse(maybeBankAccount: Option[BankAccount]) extends Response
-
 }
